@@ -25,6 +25,13 @@ orphan_inds <-
   mutate_at(.vars = vars(generic_name, brand_name), funs(tolower)) %>%
   arrange(brand_name) 
 
+## 4. Replace 'and's with semicolons
+orphan_inds <-
+  orphan_inds %>% 
+  mutate(brand_name =
+           gsub(x = brand_name,
+                pattern = ' and ',
+                replace = '; '))
 
 ## Make manual changes
 orphan_inds <-
@@ -33,7 +40,8 @@ orphan_inds <-
     
     generic_name = replace(generic_name, generic_name == 'dabrafenib and trametinib', 'trametinib and dabrafenib')
     
-    ,brand_name   = replace(brand_name, generic_name == 'trametinib and dabrafenib', 'mekinist and tafinlar')
+    ,brand_name   = replace(brand_name, generic_name == 'trametinib and dabrafenib', 'mekinist; tafinlar')
+    ,brand_name   = replace(brand_name, brand_name == '1. myozyme 2. lumizyme', 'myozyme; lumizyme')
     
     ,generic_name = replace(generic_name, brand_name == 'actimmune', 'interferon gamma-1b')
     ,generic_name = replace(generic_name, brand_name == 'bendeka', 'bendamustine for 50ml admixture')
@@ -50,7 +58,6 @@ orphan_inds <-
     ,generic_name = replace(generic_name, brand_name == 'nutropin', 'somatropin')
     ,generic_name = replace(generic_name, brand_name == 'somatuline depot', 'lanreotide acetate')
     ,generic_name = replace(generic_name, brand_name == 'thyrogen', 'thyrotropin alfa')
-   
     
     ,ind_id = 1:nrow(orphan_inds) 
     
@@ -59,7 +66,7 @@ orphan_inds <-
 
 
 
-## Determine which trade names link to multiple DISTINCT generic names
+## Determine which brand names link to multiple DISTINCT generic names
 ## There should be none if the manual changes worked
 n_distinct_generic_name <-
   orphan_inds %>%
@@ -101,16 +108,13 @@ orphan_inds %>%
   count()
 
 
-## Export a csv to fill in blank brand names (trade names)
+## Export a csv to fill in blank brand names
 dir.create('data/orphan_indications', showWarnings = F)
 
 orphan_inds %>% 
   select(ind_id, brand_name, generic_name, ends_with('date')) %>% 
   dplyr::filter(is.na(brand_name)) %>% 
   write_excel_csv('data/orphan_indications/brand_names_to_edit.csv')
-
-
-## Now import manual edits
 
 
 
