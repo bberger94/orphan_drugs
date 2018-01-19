@@ -110,11 +110,17 @@ orphan_inds %>%
 
 ## Export a csv to fill in blank brand names
 dir.create('data/orphan_indications', showWarnings = F)
+dir.create('data/orphan_indications/temp', showWarnings = F)
+
 
 orphan_inds %>% 
   select(ind_id, brand_name, generic_name, ends_with('date')) %>% 
   dplyr::filter(is.na(brand_name)) %>% 
   write_excel_csv('data/orphan_indications/brand_names_to_edit.csv')
+
+## Save orphan indications to handoff to next document
+save(orphan_inds, 'data/orphan_indications/temp/1-clean.RData')
+
 
 
 
