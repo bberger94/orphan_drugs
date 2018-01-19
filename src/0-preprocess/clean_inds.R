@@ -102,7 +102,7 @@ orphan_inds %>%
 
 ## Export a csv to perform manual edits
 dir.create('data/orphan_indications', showWarnings = F)
-write_csv(orphan_inds, 'data/orphan_indications/indications_to_edit_01-18-18.csv')
+write_excel_csv(orphan_inds, 'data/orphan_indications/indications_to_edit_01-18-18.csv')
 
 
 ## Now import manual edits
