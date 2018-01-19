@@ -13,16 +13,17 @@ names(orphan_inds) <-
   tolower() %>% 
   gsub(x = ., pattern = ' ', replacement = '_')
 
-### 2. Code NAs 
+### 2. Code NAs (and rename trade_name -> brand_name)
 orphan_inds <- 
   orphan_inds %>% 
-  mutate(trade_name = replace(trade_name, trade_name == 'n/a', NA)) 
+  mutate(brand_name = replace(trade_name, trade_name == 'n/a', NA)) %>% 
+  select(generic_name, brand_name, everything(), -trade_name)
   
-## 2. Lower case all drug names
+## 3. Lower case all drug names
 orphan_inds <- 
   orphan_inds %>% 
-  mutate_at(.vars = vars(generic_name, trade_name), funs(tolower)) %>%
-  arrange(trade_name) 
+  mutate_at(.vars = vars(generic_name, brand_name), funs(tolower)) %>%
+  arrange(brand_name) 
 
 
 ## Make manual changes
@@ -32,23 +33,23 @@ orphan_inds <-
     
     generic_name = replace(generic_name, generic_name == 'dabrafenib and trametinib', 'trametinib and dabrafenib')
     
-    ,trade_name   = replace(trade_name, generic_name == 'trametinib and dabrafenib', 'mekinist and tafinlar')
+    ,brand_name   = replace(brand_name, generic_name == 'trametinib and dabrafenib', 'mekinist and tafinlar')
     
-    ,generic_name = replace(generic_name, trade_name == 'actimmune', 'interferon gamma-1b')
-    ,generic_name = replace(generic_name, trade_name == 'bendeka', 'bendamustine for 50ml admixture')
-    ,generic_name = replace(generic_name, trade_name == 'doxil', 'doxorubicin liposome')
-    ,generic_name = replace(generic_name, trade_name == 'genotropin', 'somatropin')
-    ,generic_name = replace(generic_name, trade_name == 'jakafi', 'ruxolitinib phosphate')
-    ,generic_name = replace(generic_name, trade_name == 'gleevec', 'imatinib mesylate')
-    ,generic_name = replace(generic_name, trade_name == 'humatrope', 'somatropin')
-    ,generic_name = replace(generic_name, trade_name == 'norditropin', 'somatropin')
-    ,generic_name = replace(generic_name, trade_name == 'novantrone', 'mitoxantrone')
-    ,generic_name = replace(generic_name, trade_name == 'photofrin', 'porfimer sodium')
-    ,generic_name = replace(generic_name, trade_name == 'photrexa viscous', 'riboflavin ophthalmic solution ultraviolet-a (uva) irradiation')
-    ,generic_name = replace(generic_name, trade_name == 'salagen', 'pilocarpine')
-    ,generic_name = replace(generic_name, trade_name == 'nutropin', 'somatropin')
-    ,generic_name = replace(generic_name, trade_name == 'somatuline depot', 'lanreotide acetate')
-    ,generic_name = replace(generic_name, trade_name == 'thyrogen', 'thyrotropin alfa')
+    ,generic_name = replace(generic_name, brand_name == 'actimmune', 'interferon gamma-1b')
+    ,generic_name = replace(generic_name, brand_name == 'bendeka', 'bendamustine for 50ml admixture')
+    ,generic_name = replace(generic_name, brand_name == 'doxil', 'doxorubicin liposome')
+    ,generic_name = replace(generic_name, brand_name == 'genotropin', 'somatropin')
+    ,generic_name = replace(generic_name, brand_name == 'jakafi', 'ruxolitinib phosphate')
+    ,generic_name = replace(generic_name, brand_name == 'gleevec', 'imatinib mesylate')
+    ,generic_name = replace(generic_name, brand_name == 'humatrope', 'somatropin')
+    ,generic_name = replace(generic_name, brand_name == 'norditropin', 'somatropin')
+    ,generic_name = replace(generic_name, brand_name == 'novantrone', 'mitoxantrone')
+    ,generic_name = replace(generic_name, brand_name == 'photofrin', 'porfimer sodium')
+    ,generic_name = replace(generic_name, brand_name == 'photrexa viscous', 'riboflavin ophthalmic solution ultraviolet-a (uva) irradiation')
+    ,generic_name = replace(generic_name, brand_name == 'salagen', 'pilocarpine')
+    ,generic_name = replace(generic_name, brand_name == 'nutropin', 'somatropin')
+    ,generic_name = replace(generic_name, brand_name == 'somatuline depot', 'lanreotide acetate')
+    ,generic_name = replace(generic_name, brand_name == 'thyrogen', 'thyrotropin alfa')
    
     
     ,ind_id = 1:nrow(orphan_inds) 
@@ -62,15 +63,15 @@ orphan_inds <-
 ## There should be none if the manual changes worked
 n_distinct_generic_name <-
   orphan_inds %>%
-  dplyr::filter(!is.na(trade_name)) %>%
-  group_by(trade_name) %>%
+  dplyr::filter(!is.na(brand_name)) %>%
+  group_by(brand_name) %>%
   distinct(generic_name) %>%
   count()
 
 generic_multiples <- 
   orphan_inds %>% 
-  left_join(n_distinct_generic_name, by = 'trade_name') %>% 
-  select(ind_id, trade_name, everything()) %>% 
+  left_join(n_distinct_generic_name, by = 'brand_name') %>% 
+  select(ind_id, brand_name, everything()) %>% 
   dplyr::filter(n > 1)
 
 
@@ -87,9 +88,9 @@ if(nrow(generic_multiples) == 0) print('Hooray, no drug brand names with multipl
 ## The IMS Report indicates that 449 drugs were approved as of February 2017.
 orphan_inds %>% 
   dplyr::filter(mdy(marketing_approval_date) < '2017-03-01') %>% 
-  select(trade_name) %>% 
+  select(brand_name) %>% 
   distinct() %>% 
-  dplyr::filter(!is.na(trade_name)) %>% 
+  dplyr::filter(!is.na(brand_name)) %>% 
   count()
 
 orphan_inds %>% 
@@ -104,9 +105,9 @@ orphan_inds %>%
 dir.create('data/orphan_indications', showWarnings = F)
 
 orphan_inds %>% 
-  select(ind_id, trade_name, generic_name, ends_with('date')) %>% 
-  dplyr::filter(is.na(trade_name)) %>% 
-  write_excel_csv('data/orphan_indications/trade_names_to_edit_01-18-18.csv')
+  select(ind_id, brand_name, generic_name, ends_with('date')) %>% 
+  dplyr::filter(is.na(brand_name)) %>% 
+  write_excel_csv('data/orphan_indications/brand_names_to_edit_01-18-18.csv')
 
 
 ## Now import manual edits
