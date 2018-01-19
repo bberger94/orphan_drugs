@@ -22,8 +22,7 @@ orphan_inds <-
 ## 3. Lower case all drug names
 orphan_inds <- 
   orphan_inds %>% 
-  mutate_at(.vars = vars(generic_name, brand_name), funs(tolower)) %>%
-  arrange(brand_name) 
+  mutate_at(.vars = vars(generic_name, brand_name), funs(tolower)) 
 
 ## 4. Replace 'and's with semicolons
 orphan_inds <-
@@ -31,19 +30,23 @@ orphan_inds <-
   mutate(brand_name =
            gsub(x = brand_name,
                 pattern = ' and ',
-                replace = '; '))
+                replace = '; ')) %>% 
+  mutate(brand_name =
+           gsub(x = brand_name,
+                pattern = ', ',
+                replace = '; ')) 
 
 ## Make manual changes
 orphan_inds <-
   orphan_inds %>%
   mutate(
-    
     generic_name = replace(generic_name, generic_name == 'dabrafenib and trametinib', 'trametinib and dabrafenib')
-    
     ,brand_name   = replace(brand_name, generic_name == 'trametinib and dabrafenib', 'mekinist; tafinlar')
     ,brand_name   = replace(brand_name, brand_name == '1. myozyme 2. lumizyme', 'myozyme; lumizyme')
-    
-    ,generic_name = replace(generic_name, brand_name == 'actimmune', 'interferon gamma-1b')
+  ) %>% 
+  arrange(brand_name) %>% 
+  mutate(
+    generic_name = replace(generic_name, brand_name == 'actimmune', 'interferon gamma-1b')
     ,generic_name = replace(generic_name, brand_name == 'bendeka', 'bendamustine for 50ml admixture')
     ,generic_name = replace(generic_name, brand_name == 'doxil', 'doxorubicin liposome')
     ,generic_name = replace(generic_name, brand_name == 'genotropin', 'somatropin')
@@ -59,10 +62,10 @@ orphan_inds <-
     ,generic_name = replace(generic_name, brand_name == 'somatuline depot', 'lanreotide acetate')
     ,generic_name = replace(generic_name, brand_name == 'thyrogen', 'thyrotropin alfa')
     
-    ,ind_id = 1:nrow(orphan_inds) 
+    ,temp_id = 1:nrow(orphan_inds) 
     
   ) %>% 
-  select(ind_id, everything())
+  select(temp_id, everything())
 
 
 
@@ -78,7 +81,7 @@ n_distinct_generic_name <-
 generic_multiples <- 
   orphan_inds %>% 
   left_join(n_distinct_generic_name, by = 'brand_name') %>% 
-  select(ind_id, brand_name, everything()) %>% 
+  select(temp_id, brand_name, everything()) %>% 
   dplyr::filter(n > 1)
 
 
@@ -91,40 +94,17 @@ assert(nrow(generic_multiples) == 0)
 if(nrow(generic_multiples) == 0) print('Hooray, no drug brand names with multiple generic names!')
 
 
-## Count distinct orphan drugs
-## The IMS Report indicates that 449 drugs were approved as of February 2017.
-orphan_inds %>% 
-  dplyr::filter(mdy(marketing_approval_date) < '2017-03-01') %>% 
-  select(brand_name) %>% 
-  distinct() %>% 
-  dplyr::filter(!is.na(brand_name)) %>% 
-  count()
-
-orphan_inds %>% 
-  dplyr::filter(mdy(marketing_approval_date) < '2017-03-01') %>% 
-  select(generic_name) %>% 
-  distinct() %>%
-  dplyr::filter(!is.na(generic_name)) %>% 
-  count()
-
-
 ## Export a csv to fill in blank brand names
 dir.create('data/orphan_indications', showWarnings = F)
-dir.create('data/orphan_indications/temp', showWarnings = F)
-
+dir.create('data/temp', showWarnings = F)
 
 orphan_inds %>% 
-  select(ind_id, brand_name, generic_name, ends_with('date')) %>% 
+  select(temp_id, brand_name, generic_name, ends_with('date')) %>% 
   dplyr::filter(is.na(brand_name)) %>% 
   write_excel_csv('data/orphan_indications/brand_names_to_edit.csv')
 
-## Save orphan indications to handoff to next document
-save(orphan_inds, 'data/orphan_indications/temp/1-clean.RData')
-
-
-
-
-
+## Save data to handoff to next document
+save(list = 'orphan_inds', file = 'data/temp/1-clean_indications.RData')
 
 
 
