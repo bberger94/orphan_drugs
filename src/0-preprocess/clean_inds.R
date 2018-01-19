@@ -100,9 +100,13 @@ orphan_inds %>%
   count()
 
 
-## Export a csv to perform manual edits
+## Export a csv to fill in blank brand names (trade names)
 dir.create('data/orphan_indications', showWarnings = F)
-write_excel_csv(orphan_inds, 'data/orphan_indications/indications_to_edit_01-18-18.csv')
+
+orphan_inds %>% 
+  select(ind_id, trade_name, generic_name, ends_with('date')) %>% 
+  dplyr::filter(is.na(trade_name)) %>% 
+  write_excel_csv('data/orphan_indications/trade_names_to_edit_01-18-18.csv')
 
 
 ## Now import manual edits
