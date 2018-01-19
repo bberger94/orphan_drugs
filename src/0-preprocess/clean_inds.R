@@ -107,7 +107,7 @@ dir.create('data/orphan_indications', showWarnings = F)
 orphan_inds %>% 
   select(ind_id, brand_name, generic_name, ends_with('date')) %>% 
   dplyr::filter(is.na(brand_name)) %>% 
-  write_excel_csv('data/orphan_indications/brand_names_to_edit_01-18-18.csv')
+  write_excel_csv('data/orphan_indications/brand_names_to_edit.csv')
 
 
 ## Now import manual edits
