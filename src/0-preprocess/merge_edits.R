@@ -35,7 +35,15 @@ orphan_inds <-
     ,marketing_approval_date = mdy(marketing_approval_date)
     ,exclusivity_end_date    = mdy(exclusivity_end_date, quiet = TRUE) #NAs in this column
   ) %>% 
-  select(ind_id, everything())
+  left_join(
+    orphan_inds %>% 
+      select(brand_name) %>% 
+      distinct() %>% 
+      arrange(brand_name) %>% 
+      mutate(drug_id = 1:n())
+    , by = 'brand_name'
+  ) %>% 
+  select(ind_id, drug_id, everything())
 
 ## Count distinct orphan drugs
 ## The IMS Report indicates that 449 drugs were approved as of February 2017.
@@ -44,6 +52,7 @@ orphan_inds %>%
   select(brand_name) %>% 
   distinct() %>% 
   nrow()
+
 
 ## Save data to handoff to next document
 save(list = 'orphan_inds', file = 'data/temp/2-clean_indications.RData')
