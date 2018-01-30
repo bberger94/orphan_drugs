@@ -1,8 +1,8 @@
 
-# Export orphan indications to 
+# Export orphan indications to csv for a 2nd round of manual edits on google sheets
 
 ## Load cleaned data from file if not in memory
-load('data/orphan_indications/temp/2-clean_indications.RData')
+load('data/orphan_indications/r1/temp/2-clean_indications.RData')
 
 ## Recode orphan as binary and rename variables
 inds_to_export <- 
@@ -24,6 +24,6 @@ inds_to_export <-
     ) 
   
 ## Write to csv
-write_csv(inds_to_export, 'data/orphan_indications/cleaned_orphan_indications_01-21-18.csv')
+write_csv(inds_to_export, 'data/orphan_indications/r1/cleaned_orphan_indications_01-21-18.csv')
 
 
