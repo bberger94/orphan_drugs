@@ -104,7 +104,7 @@ orphan_inds %>%
   write_excel_csv('data/orphan_indications/brand_names_to_edit.csv')
 
 ## Save data to handoff to next document
-save(list = 'orphan_inds', file = 'data/temp/1-clean_indications.RData')
+save(list = 'orphan_inds', file = 'data/orphan_indications/temp/1-clean_indications.RData')
 
 
 

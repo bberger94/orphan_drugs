@@ -2,7 +2,7 @@
 # Export orphan indications to 
 
 ## Load cleaned data from file if not in memory
-load('data/temp/2-clean_indications.RData')
+load('data/orphan_indications/temp/2-clean_indications.RData')
 
 ## Recode orphan as binary and rename variables
 inds_to_export <- 
