@@ -20,8 +20,7 @@ exhibit8_data <-
     mutate(
       orphan_only = ifelse(orphan_only == 1, 'Orphan Only', 'Orphan with non-orphan indication(s)')
     ) %>% 
-    group_by(orphan_only) %>% 
-    count()
+    count(orphan_only)
 
 exhibit8_data %>% 
     ggplot(aes('', y = n, fill = orphan_only)) +
@@ -66,7 +65,7 @@ exhibit9_data <-
                                 'unknown')        
                                  )))
   ) %>% 
-  group_by(approval_seq) %>% count
+  count(approval_seq)
 
 exhibit9_data %>%
   ggplot(aes(x = reorder(approval_seq, c(2,3,4,1)), y = n)) +  
