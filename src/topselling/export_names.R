@@ -30,7 +30,7 @@ drug_data <-
   arrange(drug_id)
 
 ## Write to file
-output_dir <- 'data/orphan_indications/topselling'
+output_dir <- 'data/drugs/topselling'
 dir.create(output_dir, showWarnings = F)
 write_csv(
   drug_data, 
