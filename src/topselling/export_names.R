@@ -1,11 +1,10 @@
 # Count non-orphan indications for each orphan drug
 
-## After writing this data to file, 
-## export it to the OLDW, clean the brand names, 
-## and calculate total spend for each drug w/ a nonorphan ind
+## After writing this data to file, manually edit 
+## drug names to correspond closer to names in sales data
 
 ## Load indication data
-load('data/orphan_indications/r2/r2_clean_inds.RData')
+load('data/indications/r2/r2_clean_inds.RData')
 
 ## Limit data to indications approved before 2017.
 ind_data <- 
@@ -34,5 +33,5 @@ output_dir <- 'data/drugs/topselling'
 dir.create(output_dir, showWarnings = F)
 write_csv(
   drug_data, 
-  path = paste0(output_dir,'/orphan_names.csv')
+  path = paste0(output_dir,'/drug_names_to_clean.csv')
   )
