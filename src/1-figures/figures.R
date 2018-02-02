@@ -5,7 +5,7 @@ library(ggplot2)
 library(ggthemes)
 
 ## Load cleaned data
-load('data/orphan_indications/r2/r2_clean_inds.RData')
+load('data/indications/r2/r2_clean_inds.RData')
 
 ## Limit data to indications approved before 2017.
 data <- inds %>% dplyr::filter(approval_date < '2017-01-01')

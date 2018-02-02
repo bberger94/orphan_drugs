@@ -3,7 +3,7 @@
 
 ## Import orphan indications
 orphan_inds <-
-  read_excel('data/orphan_indications/r1/orphan_indications_extract_01-18-18.xlsx') 
+  read_excel('data/indications/r1/orphan_indications_extract_01-18-18.xlsx') 
 
 
 ## Initial cleaning steps:
@@ -95,16 +95,16 @@ if(nrow(generic_multiples) == 0) print('Hooray, no drug brand names with multipl
 
 
 ## Export a csv to fill in blank brand names
-dir.create('data/orphan_indications/r1', showWarnings = F)
+dir.create('data/indications/r1', showWarnings = F)
 dir.create('data/temp', showWarnings = F)
 
 orphan_inds %>% 
   select(temp_id, brand_name, generic_name, ends_with('date')) %>% 
   dplyr::filter(is.na(brand_name)) %>% 
-  write_excel_csv('data/orphan_indications/r1/brand_names_to_edit.csv')
+  write_excel_csv('data/indications/r1/brand_names_to_edit.csv')
 
 ## Save data to handoff to next document
-save(list = 'orphan_inds', file = 'data/orphan_indications/r1/temp/1-clean_indications.RData')
+save(list = 'orphan_inds', file = 'data/indications/r1/temp/1-clean_indications.RData')
 
 
 

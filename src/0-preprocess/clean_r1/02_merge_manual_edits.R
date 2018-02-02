@@ -2,10 +2,10 @@
 # Merge manual edits performed after first cleaning script
 
 ## Load cleaned data from file if not in memory
-load('data/orphan_indications/r1/temp/1-clean_indications.RData')
+load('data/indications/r1/temp/1-clean_indications.RData')
 
 ## Load manual brand name edits
-brand_name_edits <- read_csv('data/orphan_indications/r1/brand_names_edits_01-19-18.csv')
+brand_name_edits <- read_csv('data/indications/r1/brand_names_edits_01-19-18.csv')
 
 ## Merge name edits into main indication data
 orphan_inds <-
@@ -55,6 +55,6 @@ orphan_inds %>%
 
 
 ## Save data to handoff to next document
-save(list = 'orphan_inds', file = 'data/orphan_indications/r1/temp/2-clean_indications.RData')
+save(list = 'orphan_inds', file = 'data/indications/r1/temp/2-clean_indications.RData')
 
 
